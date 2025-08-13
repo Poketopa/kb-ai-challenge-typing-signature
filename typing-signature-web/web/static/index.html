@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=1280, initial-scale=1" />
+    <title>로그인 방식을 선택해 주세요 · Work24 클론</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="theme-sunrise">
+    <div class="theme-switch" aria-label="테마 전환">
+      <button class="theme-chip is-active" data-theme="theme-sunrise" title="Sunrise (은은한 노랑)">A</button>
+      <button class="theme-chip" data-theme="theme-honey" title="Honey (따뜻한 노랑)">C</button>
+      <button class="theme-chip" data-theme="theme-sunrise-glow" title="Sunrise Glow (글라스/그라데이션)">D</button>
+      <button class="theme-chip" data-theme="theme-sunrise-outline" title="Sunrise Outline (미니멀 아웃라인)">E</button>
+      <button class="theme-chip" data-theme="theme-honey-latte" title="Honey Latte (따뜻한 종이 질감)">F</button>
+    </div>
+    <main class="page" aria-label="로그인 선택 페이지">
+      <h1 class="page-title">인증 방식을 선택해 주세요</h1>
+
+      <section class="notice" aria-label="안내">
+        <div class="notice-icon" aria-hidden="true">i</div>
+        <div class="notice-body">
+          <ul>
+            <li>타이핑 서명 인증은 타이핑 패턴을 분석하여 본인을 확인하는 생체인증 방식입니다.</li>
+            <li>각 인증 방식은 보안 수준과 사용 편의성에 따라 선택하실 수 있습니다.</li>
+            <li>타이핑 서명 인증은 별도의 하드웨어나 인증서 없이 키보드만으로 안전한 인증이 가능합니다.</li>
+          </ul>
+          <a class="notice-link" href="#" role="link">타이핑 서명 인증 기술 상세 안내</a>
+        </div>
+      </section>
+
+      <div class="tabs" role="tablist" aria-label="사용자 유형">
+        <button id="tab-personal" class="tab is-active" role="tab" aria-selected="true" aria-controls="panel-personal">개인사용자</button>
+        <button id="tab-corporate" class="tab" role="tab" aria-selected="false" aria-controls="panel-corporate">기업사용자</button>
+      </div>
+
+      <section id="panel-personal" class="panel is-active" role="tabpanel" aria-labelledby="tab-personal">
+        <div class="auth-grid">
+          <!-- Left column -->
+          <article id="card-keystroke" class="card" onclick="location.href='key_auth.html'" role="button" tabindex="0">
+            <div class="card-icon" aria-hidden="true">⌨️</div>
+            <div class="card-content">
+              <h3 class="card-title">타이핑 서명 인증</h3>
+              <p class="card-desc">타이핑 패턴과 속도를 분석하여 본인을 인증하는 방식입니다. 별도의 인증서나 앱 없이 키보드 입력만으로 안전하게 로그인할 수 있어요.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">📱</div>
+            <div class="card-content">
+              <h3 class="card-title">모바일신분증</h3>
+              <p class="card-desc">모바일 신분증을 이용하여 로그인 해 보세요.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🏛️</div>
+            <div class="card-content">
+              <h3 class="card-title">공동인증서</h3>
+              <p class="card-desc">회원인증서 관리 메뉴에서 공동인증서를 등록해주셔야 이용이 가능해요. 처음 로그인 하는 경우, 다른 인증 수단을 선택해 주세요.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <!-- Right column -->
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🆔</div>
+            <div class="card-content">
+              <h3 class="card-title">아이핀인증</h3>
+              <p class="card-desc">본인 아이핀정보로 인증 후 로그인 할 수 있습니다.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">✅</div>
+            <div class="card-content">
+              <h3 class="card-title">간편인증</h3>
+              <p class="card-desc">카카오, KB국민은행, 통신사PASS, 삼성패스, 네이버, 신한은행, 토스, 뱅크샐러드, 하나은행, NH, 카카오뱅크, 우리 인증서를 이용하여 로그인 할 수 있습니다.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">💳</div>
+            <div class="card-content">
+              <h3 class="card-title">금융인증서</h3>
+              <p class="card-desc">간편비밀번호(PIN)·패턴·지문 등을 이용하여 로그인 해 보세요.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+        </div>
+
+        <aside class="signup-cta">
+          <div class="cta-illust" aria-hidden="true">🏦</div>
+          <div class="cta-body">
+            <h3 class="cta-title">안전한 인증 서비스</h3>
+            <p class="cta-desc">고객님의 안전한 금융 거래를 위해 다양한 인증 방식을 제공합니다. 본인 확인 후 서비스를 이용하실 수 있습니다.</p>
+            <ul class="cta-list">
+              <li>24시간 안전한 인증 서비스</li>
+              <li>다양한 인증 방식 지원</li>
+              <li>빠르고 편리한 본인 확인</li>
+            </ul>
+            <button class="btn primary" id="btn-join">인증 서비스 이용하기</button>
+          </div>
+        </aside>
+      </section>
+
+      <section id="panel-corporate" class="panel" role="tabpanel" aria-labelledby="tab-corporate" hidden>
+        <div class="corp-placeholder">
+          <p>기업사용자 인증 UI는 현재 더미입니다. 상단 탭으로 개인사용자/기업사용자 전환만 가능합니다.</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+</body>
+</html>
+

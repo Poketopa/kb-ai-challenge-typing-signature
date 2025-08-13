@@ -1,0 +1,242 @@
+/* 기본 테마 토큰 */
+:root {
+  --bg: #ffffff;
+  --text: #0f172a;
+  --muted: #596277;
+  --line: #e5e7eb;
+  --brand: #eab308;        /* 노랑 기본 */
+  --brand-dark: #ca8a04;   /* 노랑 진한 */
+  --surface: #fffdf5;      /* 노랑빛 배경 */
+  --card: #ffffff;
+  --accent-soft: #fef9c3;  /* soft yellow */
+  --accent-ring: rgba(234, 179, 8, 0.25);
+}
+
+/* 프로토타입 테마 1: Sunrise - 은은한 크림 노랑 + 하늘 포인트 */
+.theme-sunrise {
+  --bg: #ffffff;
+  --text: #0f172a;
+  --muted: #5b6478;
+  --line: #e9ecf3;
+  --brand: #facc15;        /* yellow-400 */
+  --brand-dark: #eab308;   /* yellow-500 */
+  --surface: #fffbeb;      /* amber-50 */
+  --card: #ffffff;
+  --accent-soft: #fff7c2;
+  --accent-ring: rgba(250, 204, 21, .35);
+}
+
+/* 프로토타입 테마 2: Honey - 따뜻한 꿀톤 + 초록 포인트 */
+.theme-honey {
+  --bg: #fffaf0;           /* ivory */
+  --text: #1f2a37;
+  --muted: #6b7280;
+  --line: #eadbb5;
+  --brand: #f4b400;        /* honey */
+  --brand-dark: #c48800;
+  --surface: #fff6d6;
+  --card: #fffef8;
+  --accent-soft: #fff1b8;
+  --accent-ring: rgba(244, 180, 0, .35);
+}
+
+/* 확장 테마: Sunrise Glow - 유리/그라데이션 강조 */
+.theme-sunrise-glow {
+  --bg: linear-gradient(180deg, #fffce8 0%, #ffffff 70%);
+  --text: #0f172a;
+  --muted: #596277;
+  --line: rgba(0,0,0,.06);
+  --brand: #fde047;        /* yellow-300 */
+  --brand-dark: #eab308;
+  --surface: rgba(255,255,255,.65);
+  --card: rgba(255,255,255,.7);
+  --accent-soft: rgba(253, 224, 71, .35);
+  --accent-ring: rgba(253, 224, 71, .45);
+  backdrop-filter: blur(6px);
+}
+
+/* 확장 테마: Sunrise Outline - 미니멀한 라인 + 화이트 공간 */
+.theme-sunrise-outline {
+  --bg: #ffffff;
+  --text: #0b1220;
+  --muted: #5b6478;
+  --line: #e9e2b5;         /* 연노랑 라인 */
+  --brand: #facc15;
+  --brand-dark: #ca8a04;
+  --surface: #fffef5;
+  --card: #ffffff;
+  --accent-soft: #fffdf0;
+  --accent-ring: rgba(234, 179, 8, .25);
+}
+
+/* 확장 테마: Honey Latte - 종이 질감 느낌(미세 노이즈) */
+.theme-honey-latte {
+  --bg: #fffaf3;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --line: #eadfd1;
+  --brand: #f1b317;
+  --brand-dark: #d09b12;
+  --surface: #fff6e3;
+  --card: #fffdf6;
+  --accent-soft: #fff2cc;
+  --accent-ring: rgba(241, 179, 23, .35);
+}
+
+/* 종이 질감 배경 (라떼 전용 옵션) */
+.theme-honey-latte body, body.theme-honey-latte {
+  background-image: radial-gradient(rgba(0,0,0,.02) 1px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* 테마 스위치 */
+.theme-switch {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; gap: 8px; justify-content: flex-end;
+  padding: 10px 20px; max-width: 1160px; margin: 0 auto;
+  background: linear-gradient(180deg, var(--surface), rgba(255,255,255,0));
+}
+.theme-chip {
+  width: 30px; height: 30px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--accent-soft);
+  color: var(--brand-dark); font-weight: 800; cursor: pointer;
+  box-shadow: 0 0 0 2px transparent;
+}
+.theme-chip.is-active { box-shadow: 0 0 0 3px var(--accent-ring); }
+
+.page {
+  max-width: 1160px;
+  margin: 40px auto 80px;
+  padding: 0 20px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.notice {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 2px 0 0 var(--accent-soft) inset;
+}
+.notice-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--accent-soft);
+  color: var(--brand-dark);
+  font-weight: 700;
+}
+.notice-body { font-size: 14px; }
+.notice-body ul { margin: 0 0 6px 18px; padding: 0; }
+.notice-link { color: var(--brand-dark); text-decoration: underline; font-weight: 500; }
+
+.tabs {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.tab {
+  padding: 12px 10px;
+  background: linear-gradient(180deg, #f9fafb, #f3f4f6);
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+.tab.is-active { background: var(--card); color: var(--brand-dark); box-shadow: inset 0 -3px 0 0 var(--brand); }
+
+.panel { margin-top: 18px; }
+.panel[hidden] { display: none !important; }
+
+.auth-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 64px 1fr 20px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  background: var(--card);
+  transition: box-shadow .2s ease, transform .15s ease;
+}
+.card:hover { box-shadow: 0 10px 24px rgba(0,0,0,0.08), 0 0 0 3px var(--accent-ring); transform: translateY(-2px); }
+.card-icon { font-size: 30px; }
+.card-title { margin: 0 0 6px; font-size: 18px; }
+.card-desc { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
+.card-arrow { color: #9ca3af; font-size: 24px; justify-self: end; }
+
+.logo-row { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+.logo-badge {
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: #374151; font-size: 12px; font-weight: 700;
+}
+
+.signup-cta {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--accent-soft);
+  padding: 18px;
+}
+.cta-illust { font-size: 60px; text-align: center; filter: drop-shadow(0 4px 0 rgba(0,0,0,.05)); }
+.cta-title { margin: 0 0 6px; font-size: 22px; font-weight: 800; color: var(--brand-dark); }
+.cta-desc { margin: 0 0 10px; color: var(--text); opacity: .85; }
+.cta-list { margin: 0 0 12px 18px; color: var(--text); opacity: .75; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 40px; padding: 0 16px; border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: 700; cursor: pointer;
+}
+.btn.primary { background: var(--brand); color: #1f2937; }
+.btn.primary:hover { background: var(--brand-dark); }
+
+.corp-placeholder {
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 28px; color: var(--muted);
+}
+
+/* desktop only base width lock to mimic original page */
+@media (min-width: 1280px) {
+  body { background: linear-gradient(#fff, #fff) no-repeat; }
+}
+
+

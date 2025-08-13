@@ -1,0 +1,178 @@
+# ===== Root .gitignore (merged) =====
+
+# ----- OS / Editor -----
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ----- IDE -----
+.idea/
+.vscode/
+*.code-workspace
+
+# ----- Android / Gradle -----
+.gradle/
+local.properties
+app/build/
+build/
+bin/
+gen/
+out/
+proguard/
+.navigation/
+captures/
+.externalNativeBuild
+.cxx/
+# Gradle wrapper
+gradle/wrapper/gradle-wrapper.jar
+
+# ----- Android build artifacts -----
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+*.class
+
+# ----- IntelliJ / Android Studio -----
+*.iml
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+.idea/modules.xml
+.idea/navEditor.xml
+vcs.xml
+
+# ----- Fastlane / Freeline -----
+freeline.py
+freeline/
+freeline_project_description.json
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+fastlane/readme.md
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+venv.bak/
+env.bak/
+.python-version
+
+# Type checker / tooling caches
+.mypy_cache/
+.pytype/
+.pyre/
+.ruff_cache/
+.pytest_cache/
+.tox/
+.nox/
+.cache
+
+# Packaging / build artifacts
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+pip-wheel-metadata/
+
+# Unit test / coverage
+htmlcov/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+coverage/
+
+# Jupyter
+.ipynb_checkpoints/
+.profile_default/
+.jupyter/
+
+# ----- Environments / Secrets -----
+.env
+.env.*
+*.env
+secret.key
+
+# ----- Logs -----
+logs/
+*.log
+
+# ----- Data / Artifacts -----
+data/
+datasets/
+artifacts/
+outputs/
+runs/
+checkpoints/
+results/
+wandb/
+
+# Keep specific evaluation CSVs used in docs/results
+!typing-signature-web/results/evaluation_results.csv
+!typing-signature-model/results/evaluation_results.csv
+!typing-signature-app/model-db/results/evaluation_results.csv
+
+# ----- Models / Large binaries -----
+models/
+*.pt
+*.pth
+*.onnx
+*.tflite
+*.pb
+
+# ----- Project data folders -----
+enrollments/
+
+# ----- Node / Misc -----
+node_modules/
+*.tmp
+*.temp
+.tmp/
+tmp/
+.temp/
+*.swp
+
+# ----- Linux temp -----
+*~
+
+# ----- End of merged rules -----

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>지갑 메인</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #0f172a;
+      --muted: #5b6478;
+      --line: #e9ecf3;
+      --brand: #facc15;
+      --brand-dark: #eab308;
+      --surface: #fffbeb;
+      --card: #ffffff;
+      --accent-soft: #fff7c2;
+      --accent-ring: rgba(250, 204, 21, .35);
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      min-height: 100vh;
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      max-width: 430px;
+      margin: 0 auto;
+      background: var(--bg);
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 80px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 16px 8px 16px;
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 2px 8px rgba(250,204,21,0.04);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+    .family-badge {
+      background: var(--brand);
+      color: #fff;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 8px;
+      font-size: 18px;
+      box-shadow: 0 2px 8px var(--accent-ring);
+    }
+    .user-name {
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .header-right .icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      margin-left: 12px;
+      background-size: cover;
+    }
+    .icon.bell { background: url('https://cdn-icons-png.flaticon.com/512/1827/1827392.png') no-repeat center/contain; }
+    .icon.search { background: url('https://cdn-icons-png.flaticon.com/512/54/54481.png') no-repeat center/contain; }
+    .icon.menu { background: url('https://cdn-icons-png.flaticon.com/512/1828/1828859.png') no-repeat center/contain; }
+
+    .asset-section {
+      margin: 18px 0 0 0;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .asset-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 18px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 17px;
+      font-weight: 500;
+      box-shadow: 0 1px 4px var(--accent-ring);
+      border: 1px solid var(--line);
+    }
+    .asset-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--brand-dark);
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0 0 0;
+      padding: 0 16px;
+    }
+    .action-card {
+      flex: 1;
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 16px 8px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      min-width: 0;
+      position: relative;
+      font-size: 15px;
+      font-weight: 500;
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 4px var(--accent-ring);
+      transition: box-shadow .2s;
+    }
+    .action-card:hover {
+      box-shadow: 0 4px 16px var(--accent-ring);
+    }
+    .action-card:nth-child(2) { background: var(--accent-soft); }
+    .action-card:nth-child(3) { background: #f3f8ff; }
+    .action-desc {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .action-icon {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      width: 32px;
+      height: 32px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      opacity: 0.85;
+    }
+    .action-icon.shoe { background-image: url('https://cdn-icons-png.flaticon.com/512/1041/1041916.png'); }
+    .action-icon.piggy { background-image: url('https://cdn-icons-png.flaticon.com/512/616/616494.png'); }
+    .action-icon.plant { background-image: url('https://cdn-icons-png.flaticon.com/512/2909/2909765.png'); }
+
+    .exchange-section {
+      background: var(--card);
+      border-radius: 18px;
+      margin: 24px 16px 0 16px;
+      padding: 18px 16px 12px 16px;
+      box-shadow: 0 1px 4px var(--accent-ring);
+      border: 1px solid var(--line);
+    }
+    .exchange-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .exchange-tab {
+      padding: 2px 10px;
+      border-radius: 12px;
+      background: #f2f2f2;
+      font-size: 14px;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+    }
+    .exchange-tab.selected {
+      background: var(--accent-soft);
+      color: var(--brand-dark);
+      font-weight: bold;
+      box-shadow: 0 2px 0 0 var(--brand);
+    }
+    .exchange-time {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 8px 0 0 0;
+    }
+    .exchange-rates {
+      display: flex;
+      gap: 18px;
+      margin: 16px 0 0 0;
+    }
+    .rate-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      background: var(--surface);
+      border-radius: 10px;
+      padding: 10px 0;
+      border: 1px solid var(--line);
+    }
+    .flag {
+      width: 28px;
+      height: 20px;
+      margin-bottom: 4px;
+      background-size: cover;
+      display: inline-block;
+    }
+    .flag.usd { background-image: url('https://cdn-icons-png.flaticon.com/512/555/555526.png'); }
+    .flag.jpy { background-image: url('https://cdn-icons-png.flaticon.com/512/555/555497.png'); }
+    .flag.eur { background-image: url('https://cdn-icons-png.flaticon.com/512/555/555515.png'); }
+    .rate-value {
+      font-size: 17px;
+      font-weight: bold;
+      color: var(--brand-dark);
+      margin-top: 2px;
+    }
+    .exchange-links {
+      display: flex;
+      justify-content: flex-end;
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .exchange-link {
+      font-size: 13px;
+      color: var(--brand-dark);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .bottom-tab {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 100vw;
+      max-width: 430px;
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 64px;
+      z-index: 100;
+      box-shadow: 0 -2px 8px var(--accent-ring);
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+      flex: 1;
+      padding: 6px 0 0 0;
+      transition: color .2s;
+    }
+    .tab-item.active {
+      color: var(--brand-dark);
+      font-weight: bold;
+    }
+    .tab-icon {
+      width: 26px;
+      height: 26px;
+      margin-bottom: 2px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      display: inline-block;
+    }
+    .tab-icon.product { background-image: url('https://cdn-icons-png.flaticon.com/512/1170/1170678.png'); }
+    .tab-icon.asset { background-image: url('https://cdn-icons-png.flaticon.com/512/1828/1828884.png'); }
+    .tab-icon.wallet { background-image: url('https://cdn-icons-png.flaticon.com/512/3523/3523887.png'); }
+    .tab-icon.benefit { background-image: url('https://cdn-icons-png.flaticon.com/512/1828/1828919.png'); }
+    .tab-icon.theme { background-image: url('https://cdn-icons-png.flaticon.com/512/1828/1828911.png'); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 상단 네비게이션 -->
+    <div class="header">
+      <div class="header-left">
+        <span class="family-badge">F</span>
+        <span class="user-name">임현성님</span>
+      </div>
+      <div class="header-right">
+        <span class="icon bell"></span>
+        <span class="icon search"></span>
+        <span class="icon menu"></span>
+      </div>
+    </div>
+
+    <!-- 자산/카드/지출 카드 -->
+    <div class="asset-section">
+      <div class="asset-card">
+        <span>나의 총자산</span>
+        <span class="asset-value">1,205,000원</span>
+      </div>
+      <div class="asset-card">
+        <span>이번 주 카드결제</span>
+        <span class="asset-value">243,500원</span>
+      </div>
+      <div class="asset-card">
+        <span>오늘한 지출</span>
+        <span class="asset-value">18,000원</span>
+      </div>
+    </div>
+
+    <!-- 오늘의 걸음, 용돈 받기, 식물 키우기 -->
+    <div class="quick-actions">
+      <div class="action-card">
+        <span>적금 가입하기</span>
+        <span class="action-desc">연동하기 &gt;</span>
+        <span class="action-icon shoe"></span>
+      </div>
+      <div class="action-card">
+        <span>용돈 받기</span>
+        <span class="action-desc">매일 랜덤 &gt;</span>
+        <span class="action-icon piggy"></span>
+      </div>
+      <div class="action-card">
+        <span>캐시백 확인</span>
+        <span class="action-desc">포인트 + 혜택</span>
+        <span class="action-icon plant"></span>
+      </div>
+    </div>
+
+    <!-- 환율 정보 -->
+    <div class="exchange-section">
+      <div class="exchange-header">
+        <span>환율</span>
+        <span class="exchange-tab selected">환율</span>
+        <span class="exchange-tab">증시</span>
+      </div>
+      <div class="exchange-time">매매기준율 2025.08.08 04:59:08</div>
+      <div class="exchange-rates">
+        <div class="rate-card">
+          <span class="flag usd"></span>
+          <span>USD</span>
+          <span class="rate-value">1,391.50</span>
+        </div>
+        <div class="rate-card">
+          <span class="flag jpy"></span>
+          <span>JPY</span>
+          <span class="rate-value">941.92</span>
+        </div>
+        <div class="rate-card">
+          <span class="flag eur"></span>
+          <span>EUR</span>
+          <span class="rate-value">1,619.98</span>
+        </div>
+      </div>
+      <div class="exchange-links">
+        <span class="exchange-link">환율조회</span>
+        <span class="exchange-link">환전신청</span>
+      </div>
+    </div>
+
+    <!-- 하단 탭바 -->
+    <nav class="bottom-tab">
+      <div class="tab-item">
+        <span class="tab-icon product"></span>
+        <span>상품</span>
+      </div>
+      <div class="tab-item">
+        <span class="tab-icon asset"></span>
+        <span>자산</span>
+      </div>
+      <div class="tab-item active">
+        <span class="tab-icon wallet"></span>
+        <span>지갑</span>
+      </div>
+      <div class="tab-item">
+        <span class="tab-icon benefit"></span>
+        <span>혜택</span>
+      </div>
+      <div class="tab-item">
+        <span class="tab-icon theme"></span>
+        <span>테마</span>
+      </div>
+    </nav>
+  </div>
+</body>
+</html>
+

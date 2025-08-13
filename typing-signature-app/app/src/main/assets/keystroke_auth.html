@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타이핑 서명 인증</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <style>
+        :root {
+            --y: #fbbf24;
+            --yd: #f59e0b;
+            --text: #1f2937;
+            --line: #ece7c8;
+            --glass-bg: rgba(255,255,255,0.65);
+            --glass-blur: 18px;
+            --success: #34d399;
+            --error: #f87171;
+            --info: #60a5fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            background: linear-gradient(135deg, #fffce8, #fff);
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .auth-panel {
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 20px 40px rgba(0,0,0,.06);
+            padding: 24px;
+            margin-top: 20px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--text);
+        }
+        
+        .mode-indicator {
+            background: #fef9c3;
+            border-radius: 10px;
+            padding: 10px 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #b45309;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(251,191,36,0.08);
+        }
+        
+        .target-text {
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: #fffef8;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+        
+        .input-field {
+            width: 100%;
+            height: 48px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 0 14px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(251,191,36,.25);
+            border-color: var(--y);
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            height: 42px;
+            padding: 0 20px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn.primary {
+            background: linear-gradient(135deg, var(--y), var(--yd));
+            color: #1f2937;
+            border-color: transparent;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 16px rgba(251,191,36,0.15);
+        }
+        
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+            border: 1.5px solid rgba(255,255,255,0.25);
+            padding: 28px 24px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: .3s box-shadow;
+        }
+        
+        .glass-card.success {
+            border-color: var(--success);
+            box-shadow: 0 8px 32px rgba(52,211,153,0.10);
+        }
+        
+        .glass-card .icon {
+            font-size: 38px;
+            position: absolute;
+            top: -22px;
+            right: 18px;
+            opacity: 0.18;
+            pointer-events: none;
+        }
+        
+        .glass-card .title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .glass-card .desc {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+        
+        .result-extra {
+            margin: 18px 0 0 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .score-badges {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        
+        .score-badge {
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        
+        .score-badge.yellow {
+            background: #fef9c3;
+            color: #b45309;
+        }
+        
+        .score-badge.blue {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+        
+        .score-badge.green {
+            background: #dcfce7;
+            color: #059669;
+        }
+        
+        .success-message {
+            font-weight: 600;
+            font-size: 16px;
+            color: #059669;
+            margin-top: 2px;
+            letter-spacing: -0.2px;
+        }
+        
+        .json-view {
+            font-family: ui-monospace, Menlo, Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            background: rgba(255,255,255,0.7);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 22px 0 0 0;
+            overflow-x: auto;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            border: 1px solid #f3f4f6;
+            white-space: pre-wrap;
+        }
+        
+        .pattern-display {
+            font-size: 12px;
+            color: #a3a3a3;
+            margin-top: 10px;
+            word-break: break-all;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        /* 새로운 결과 카드 스타일 */
+        .success-header, .error-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .success-icon-wrapper, .error-icon-wrapper {
+            margin-bottom: 16px;
+        }
+        
+        .success-icon, .error-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-size: 36px;
+            color: white;
+            position: relative;
+        }
+        
+        .success-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+        }
+        
+        .error-icon {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 8px 32px rgba(239, 68, 68, 0.3);
+        }
+        
+        .success-icon::after, .error-icon::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid;
+            opacity: 0.3;
+        }
+        
+        .success-icon::after {
+            border-color: #10b981;
+        }
+        
+        .error-icon::after {
+            border-color: #ef4444;
+        }
+        
+        .success-title, .error-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .success-title {
+            color: #059669;
+        }
+        
+        .error-title {
+            color: #dc2626;
+        }
+        
+        .success-subtitle, .error-subtitle {
+            font-size: 16px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .score-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .score-badge {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .score-badge:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        }
+        
+        .score-badge.yellow {
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, #fef9c3, #fde68a);
+        }
+        
+        .score-badge.blue {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+        }
+        
+        .score-badge.green {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+        }
+        
+        .badge-icon {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.8);
+            border-radius: 12px;
+        }
+        
+        .badge-content {
+            flex: 1;
+        }
+        
+        .badge-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1f2937;
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border: 2px solid #10b981;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .message-icon {
+            font-size: 32px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+        }
+        
+        .message-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #059669;
+        }
+        
+        .response-section, .pattern-section {
+            margin-bottom: 24px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 12px;
+        }
+        
+        .json-view {
+            font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(249,250,251,0.9));
+            border-radius: 12px;
+            padding: 20px;
+            margin: 0;
+            overflow-x: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid #e5e7eb;
+            white-space: pre-wrap;
+            position: relative;
+        }
+        
+        .json-view::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--y), var(--yd));
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .pattern-display {
+            font-family: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+            font-size: 11px;
+            color: #6b7280;
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            word-break: break-all;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        .pattern-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #6b7280, #9ca3af);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .error-actions {
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .retry-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+        }
+        
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+        }
+        
+        /* 애니메이션 효과 */
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        } */
+        
+        .status-ani {
+            animation: fadeInUp .7s cubic-bezier(.23,1.01,.32,1) both;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .progress {
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        
+        .progress-bar {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--y), var(--yd));
+            transition: width .25s;
+        }
+        
+        .processing-status {
+            text-align: center;
+            color: #6b7280;
+            margin: 20px 0;
+        }
+        
+        /* 로딩 효과 스타일 */
+        .loading-container {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        
+        .loading-spinner::before,
+        .loading-spinner::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .loading-spinner::before {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--y), var(--yd));
+            opacity: 0.3;
+            animation-delay: 0s;
+        }
+        
+        .loading-spinner::after {
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(135deg, var(--y), var(--yd));
+            opacity: 0.6;
+            top: 15%;
+            left: 15%;
+            animation-delay: 0.5s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+        
+        .loading-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--y), var(--yd));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .loading-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--y), var(--yd));
+            border-radius: 999px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+        
+        .loading-steps {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            color: var(--y);
+            font-weight: 600;
+        }
+        
+        .step.completed {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .step-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .step-icon.pending {
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
+        
+        .step-icon.active {
+            background: var(--y);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .step-icon.completed {
+            background: var(--success);
+            color: white;
+        }
+        
+        .floating-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--y);
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-20px) rotate(180deg);
+                opacity: 1;
+            }
+        }
+        
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+        .particle:nth-child(3) { left: 30%; animation-delay: 1s; }
+        .particle:nth-child(4) { left: 40%; animation-delay: 1.5s; }
+        .particle:nth-child(5) { left: 50%; animation-delay: 2s; }
+        .particle:nth-child(6) { left: 60%; animation-delay: 2.5s; }
+        .particle:nth-child(7) { left: 70%; animation-delay: 0.2s; }
+        .particle:nth-child(8) { left: 80%; animation-delay: 0.7s; }
+        .particle:nth-child(9) { left: 90%; animation-delay: 1.2s; }
+        
+        /* 팝업 스타일 */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .popup-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 320px;
+            width: 90%;
+            animation: slideUp 0.4s ease-out;
+            border: 1px solid #e9ecf3;
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+        
+        .popup-title {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        }
+        
+        .popup-message {
+            margin: 0 0 25px 0;
+            font-size: 18px;
+            color: #5b6478;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            line-height: 1.4;
+        }
+        
+        .popup-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            min-width: 120px;
+        }
+        
+        .popup-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-panel">
+            <div class="title">타이핑 서명 인증</div>
+            
+            <div class="mode-indicator">
+                <span style="font-weight: 800; letter-spacing: 0.5px;">모드: 검증 (Verify)</span>
+            </div>
+            
+            <div class="target-text" id="targetText">좋은 하루 보내세요</div>
+            
+            <input 
+                type="text" 
+                class="input-field" 
+                id="userInput" 
+                placeholder="여기에 입력하세요" 
+                autocomplete="off"
+            />
+            
+            <div class="button-row">
+                <button class="btn primary" id="startAuthBtn">인증 시작</button>
+                <button class="btn" id="resetBtn">다시 시작</button>
+            </div>
+            
+            <!-- 세련된 로딩 컨테이너 -->
+            <div id="loadingContainer" class="loading-container">
+                <div class="floating-particles">
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                </div>
+                
+                <div class="loading-spinner"></div>
+                
+                <div class="loading-text">타이핑 서명 분석 중...</div>
+                <div class="loading-subtitle">타이핑 패턴을 분석하고 있습니다</div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text" id="progressText">0%</div>
+                </div>
+                
+                <div class="loading-steps">
+                    <div class="step" id="step1">
+                        <div class="step-icon pending" id="stepIcon1">1</div>
+                        <span>패턴 수집</span>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-icon pending" id="stepIcon2">2</div>
+                        <span>데이터 분석</span>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-icon pending" id="stepIcon3">3</div>
+                        <span>인증 검증</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="resultCard" style="display: none;"></div>
+        </div>
+        
+        <!-- 인증 성공 팝업 -->
+        <div id="authSuccessPopup" class="popup-overlay" style="display: none;">
+            <div class="popup-container">
+                <div class="success-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="white"/>
+                    </svg>
+                </div>
+                <h2 class="popup-title">인증 성공!</h2>
+                <p class="popup-message"><strong>임현성</strong>님<br>인증되었습니다!</p>
+                <button class="popup-button" onclick="closePopupAndNavigate()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class KeystrokeAuth {
+            constructor() {
+                this.state = 'idle';
+                this.targetText = '좋은 하루 보내세요';
+                this.userInput = '';
+                this.eventsSessions = [];
+                this.currentEvents = [];
+                this.sessionCount = 0;
+                this.progress = 0;
+                this.result = null;
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.focusInput();
+            }
+            
+            initializeElements() {
+                console.log('Initializing elements...');
+                
+                this.inputElement = document.getElementById('userInput');
+                this.startBtn = document.getElementById('startAuthBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                // this.processingStatus = document.getElementById('processingStatus'); // 존재하지 않는 요소
+                // this.progressBar = document.getElementById('progressBar'); // 존재하지 않는 요소
+                this.resultCard = document.getElementById('resultCard');
+                
+                // 새로운 로딩 요소들
+                this.loadingContainer = document.getElementById('loadingContainer');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressText = document.getElementById('progressText');
+                this.step1 = document.getElementById('step1');
+                this.step2 = document.getElementById('step2');
+                this.step3 = document.getElementById('step3');
+                this.stepIcon1 = document.getElementById('stepIcon1');
+                this.stepIcon2 = document.getElementById('stepIcon2');
+                this.stepIcon3 = document.getElementById('stepIcon3');
+                
+                // 요소 초기화 확인
+                console.log('Elements initialized:');
+                console.log('- inputElement:', this.inputElement);
+                console.log('- startBtn:', this.startBtn);
+                console.log('- resetBtn:', this.resetBtn);
+                console.log('- resultCard:', this.resultCard);
+                console.log('- loadingContainer:', this.loadingContainer);
+                console.log('- progressFill:', this.progressFill);
+                console.log('- progressText:', this.progressText);
+            }
+            
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.startAuthentication());
+                this.resetBtn.addEventListener('click', () => this.reset());
+                this.inputElement.addEventListener('input', (e) => {
+                    this.userInput = e.target.value;
+                });
+                this.inputElement.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.startAuthentication();
+                    }
+                });
+            }
+            
+            focusInput() {
+                this.inputElement.focus();
+            }
+            
+            async startAuthentication() {
+                console.log('startAuthentication called');
+                if (this.state === 'processing') return;
+                
+                if (this.userInput.trim() !== this.targetText) {
+                    alert('문장을 정확히 입력해주세요.');
+                    this.inputElement.focus();
+                    return;
+                }
+                
+                console.log('Setting state to processing');
+                this.setState('processing');
+                console.log('Showing loading effect');
+                this.showLoadingEffect();
+                
+                try {
+                    if (this.sessionCount < 3) {
+                        this.eventsSessions.push(this.currentEvents.filter(ev=>ev.release!=null));
+                        this.sessionCount += 1;
+                        this.currentEvents = [];
+                        this.setState('success');
+                    } else {
+                        await this.verify();
+                    }
+                } catch (error) {
+                    console.log('Error occurred:', error);
+                    this.result = { error: error.message || '네트워크 오류' };
+                    this.setState('error');
+                    // 에러의 경우 즉시 결과 표시
+                    setTimeout(() => {
+                        this.loadingContainer.style.display = 'none';
+                        this.showResult();
+                    }, 1000);
+                }
+            }
+
+            onKeyDown(e){
+                const t = performance.now();
+                const last = this.currentEvents.find(ev=>ev.key===e.key && ev.release==null);
+                if(!last){
+                    this.currentEvents.push({ key:e.key, press:t/1000, release:null });
+                }
+            }
+            onKeyUp(e){
+                const t = performance.now();
+                const last = [...this.currentEvents].reverse().find(ev=>ev.key===e.key && ev.release==null);
+                if(last){
+                    last.release = t/1000;
+                }
+            }
+
+            async enroll() {
+                const loginId = (window.getLoginId && window.getLoginId()) || (window.__LOGIN_ID || 'user');
+                const payload = {
+                    user: loginId,
+                    sessions: this.eventsSessions
+                };
+                const res = await fetch('http://10.0.2.2:8000/api/enroll', {
+                    method:'POST',
+                    headers: { 'Content-Type':'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if(!res.ok){ throw new Error('등록 실패'); }
+                return await res.json();
+            }
+
+            async verify() {
+                try { await this.enroll(); } catch(e){ console.warn('enroll failed/skip', e); }
+                const loginId = (window.getLoginId && window.getLoginId()) || (window.__LOGIN_ID || 'user');
+                const lastSession = this.eventsSessions[this.eventsSessions.length-1] || [];
+                const payload = {
+                    user: loginId,
+                    events: lastSession
+                };
+                const res = await fetch('http://10.0.2.2:8000/api/verify', {
+                    method:'POST',
+                    headers: { 'Content-Type':'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if(!data || data.decision == null){
+                    this.result = { error: '임계값 부재: 재시도 필요' };
+                    this.setState('error');
+                } else if (data.decision === 'ACCEPT') {
+                    this.result = data;
+                    this.setState('success');
+                } else {
+                    this.result = data;
+                    this.setState('error');
+                }
+            }
+            
+            setState(newState) {
+                console.log('setState called:', this.state, '->', newState);
+                this.state = newState;
+                console.log('New state:', this.state);
+            }
+            
+            showProcessingStatus() {
+                // this.processingStatus.style.display = 'block'; // 존재하지 않는 요소
+                // this.progressBar.style.width = '0%'; // 존재하지 않는 요소
+                
+                const timer = setInterval(() => {
+                    this.progress += 8;
+                    // this.progressBar.style.width = Math.min(100, this.progress) + '%'; // 존재하지 않는 요소
+                    
+                    if (this.progress >= 100) {
+                        clearInterval(timer);
+                    }
+                }, 160);
+            }
+            
+            showLoadingEffect() {
+                console.log('showLoadingEffect called');
+                console.log('loadingContainer:', this.loadingContainer);
+                
+                this.loadingContainer.style.display = 'block';
+                this.progressFill.style.width = '0%';
+                this.progressText.textContent = '0%';
+                
+                console.log('Loading effect displayed, starting simulation...');
+                
+                // 단계별 진행 상황 시뮬레이션
+                this.simulateLoadingSteps();
+            }
+            
+            simulateLoadingSteps() {
+                let progress = 0;
+                const totalSteps = 3;
+                let currentStep = 0;
+                
+                const timer = setInterval(() => {
+                    // 더 자연스러운 랜덤 속도: 3-12%씩 증가 (200ms마다)
+                    progress += Math.random() * 9 + 3;
+                    
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(timer);
+                        this.completeLoading();
+                    }
+                    
+                    // 진행률 업데이트
+                    this.progressFill.style.width = Math.min(progress, 100) + '%';
+                    this.progressText.textContent = Math.round(Math.min(progress, 100)) + '%';
+                    
+                    // 단계별 진행 상황 업데이트
+                    if (progress >= 30 && currentStep === 0) {
+                        this.updateStep(1, 'active');
+                        currentStep = 1;
+                    } else if (progress >= 60 && currentStep === 1) {
+                        this.updateStep(1, 'completed');
+                        this.updateStep(2, 'active');
+                        currentStep = 2;
+                    } else if (progress >= 90 && currentStep === 2) {
+                        this.updateStep(2, 'completed');
+                        this.updateStep(3, 'active');
+                        currentStep = 3;
+                    }
+                }, 200);
+            }
+            
+            updateStep(stepNumber, status) {
+                const step = this[`step${stepNumber}`];
+                const stepIcon = this[`stepIcon${stepNumber}`];
+                
+                if (step && stepIcon) {
+                    step.className = `step ${status}`;
+                    stepIcon.className = `step-icon ${status}`;
+                    
+                    // 완료된 단계에 체크 표시
+                    if (status === 'completed') {
+                        stepIcon.innerHTML = '✓';
+                    }
+                }
+            }
+            
+            completeLoading() {
+                console.log('completeLoading called');
+                // 마지막 단계 완료
+                this.updateStep(3, 'completed');
+                
+                // 성공 상태 설정
+                this.setState('success');
+                console.log('State set to success');
+                
+                // 잠시 대기 후 결과 표시
+                setTimeout(() => {
+                    console.log('Timeout completed, hiding loading container');
+                    this.loadingContainer.style.display = 'none';
+                    console.log('Calling showResult...');
+                    this.showResult();
+                }, 800);
+            }
+            
+            showResult() {
+                console.log('showResult called, state:', this.state);
+                console.log('result:', this.result);
+                
+                
+                // processingStatus가 존재하지 않으므로 제거
+                // this.processingStatus.style.display = 'none';
+                
+                // 결과 카드 생성 및 표시
+                if (this.state === 'success') {
+                    console.log('Creating success card...');
+                    this.resultCard.innerHTML = this.createSuccessCard();
+                    this.resultCard.style.display = 'block';
+                    console.log('Success card displayed');
+                    
+                    // 성공 애니메이션 효과 추가
+                    setTimeout(() => {
+                        this.addSuccessEffects();
+                    }, 100);
+                    
+                                // 3초 후 인증 성공 팝업 표시
+            console.log('Setting timeout for popup (3 seconds)');
+            setTimeout(() => {
+                console.log('Timeout executed, calling showAuthSuccessPopup');
+                this.showAuthSuccessPopup();
+            }, 3000);
+                } else if (this.state === 'error') {
+                    console.log('Creating error card...');
+                    this.resultCard.innerHTML = this.createErrorCard();
+                    this.resultCard.style.display = 'block';
+                    console.log('Error card displayed');
+                } else {
+                    console.log('Unknown state:', this.state);
+                }
+            }
+            
+            addSuccessEffects() {
+                // 성공 배지들에 애니메이션 효과 추가
+                const badges = this.resultCard.querySelectorAll('.score-badge');
+                badges.forEach((badge, index) => {
+                    setTimeout(() => {
+                        badge.style.animation = 'bounceIn 0.6s ease-out';
+                    }, index * 200);
+                });
+                
+                // 축하 효과 제거
+                // this.createConfetti();
+            }
+            
+            createSuccessCard() {
+                return `
+                    <div class="glass-card success status-ani">
+                        <div class="icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        
+                        <div class="success-header">
+                            <div class="success-icon-wrapper">
+                                <div class="success-icon">
+                                    <i class="fa-solid fa-shield-check"></i>
+                                </div>
+                            </div>
+                            <div class="success-title">
+                                <i class="fa-solid fa-bolt"></i> 인증 성공!
+                            </div>
+                            <div class="success-subtitle">타이핑 패턴이 성공적으로 인증되었습니다</div>
+                        </div>
+                        
+                        <div class="result-extra">
+                            <div class="score-badges">
+                                <div class="score-badge yellow">
+                                    <div class="badge-icon">📊</div>
+                                    <div class="badge-content">
+                                        <div class="badge-label">Distance Score</div>
+                                        <div class="badge-value">0.084</div>
+                                    </div>
+                                </div>
+                                <div class="score-badge blue">
+                                    <div class="badge-icon">🏷️</div>
+                                    <div class="badge-content">
+                                        <div class="badge-label">Label</div>
+                                        <div class="badge-value">1.0</div>
+                                    </div>
+                                </div>
+                                <div class="score-badge green">
+                                    <div class="badge-icon">🎯</div>
+                                    <div class="badge-content">
+                                        <div class="badge-label">Prediction</div>
+                                        <div class="badge-value">success</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="response-section">
+                            <div class="section-header">
+                                <i class="fa-solid fa-code"></i>
+                                <span>Response DTO</span>
+                            </div>
+                            <div class="json-view">${this.formatJSON(this.result)}</div>
+                        </div>
+                        
+                        
+                    </div>
+                `;
+            }
+            
+            createErrorCard() {
+                return `
+                    <div class="glass-card error status-ani">
+                        <div class="icon">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        
+                        <div class="error-header">
+                            <div class="error-icon-wrapper">
+                                <div class="error-icon">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                </div>
+                            </div>
+                            <div class="error-title">
+                                <i class="fa-solid fa-exclamation-triangle"></i> 인증 실패
+                            </div>
+                            <div class="error-subtitle">${this.result?.error || '다시 시도해 주세요.'}</div>
+                        </div>
+                        
+                        <div class="error-actions">
+                            <button class="retry-btn" onclick="window.keystrokeAuth.reset()">
+                                <i class="fa-solid fa-rotate"></i>
+                                다시 시도
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            formatJSON(obj) {
+                return JSON.stringify(obj, null, 2)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+            }
+            
+            reset() {
+                this.setState('idle');
+                this.userInput = '';
+                this.pattern = '';
+                this.progress = 0;
+                this.result = null;
+                
+                this.inputElement.value = '';
+                this.resultCard.style.display = 'none';
+                this.focusInput();
+            }
+            
+            // 인증 성공 팝업 표시
+            showAuthSuccessPopup() {
+                console.log('showAuthSuccessPopup called');
+                
+                const popup = document.getElementById('authSuccessPopup');
+                console.log('Popup element:', popup);
+                
+                if (popup) {
+                    popup.style.display = 'flex';
+                    console.log('Popup display set to flex');
+                    console.log('Popup computed style:', window.getComputedStyle(popup).display);
+                } else {
+                    console.error('Popup element not found');
+                }
+            }
+            
+            // 팝업 닫기 및 페이지 이동
+            closePopupAndNavigate() {
+                console.log('closePopupAndNavigate called');
+                
+                // 팝업 숨기기
+                const popup = document.getElementById('authSuccessPopup');
+                if (popup) {
+                    popup.style.display = 'none';
+                    console.log('Popup hidden');
+                }
+                
+                // Android 환경에서는 Android 인터페이스를 통해 이동
+                if (typeof Android !== 'undefined' && Android.navigateToMainPage) {
+                    console.log('Calling Android.navigateToMainPage');
+                    Android.navigateToMainPage();
+                } else {
+                    // 웹 환경에서는 직접 이동
+                    console.log('Navigating to main_page.html');
+                    window.location.href = 'main_page.html';
+                }
+            }
+        }
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            new KeystrokeAuth();
+        });
+        
+        // Android JavaScript Interface 연동
+        if (window.Android) {
+            // Android에서 호출할 수 있는 함수들
+            window.startAndroidRecording = function() {
+                console.log('Android recording started');
+            };
+            
+            window.getAndroidTypingPattern = function() {
+                return window.keystrokeAuth?.pattern || '';
+            };
+        }
+        
+        // 전역 함수로 팝업 닫기 및 페이지 이동
+        function closePopupAndNavigate() {
+            console.log('Global closePopupAndNavigate called');
+            
+            // 팝업 숨기기
+            const popup = document.getElementById('authSuccessPopup');
+            if (popup) {
+                popup.style.display = 'none';
+                console.log('Popup hidden');
+            }
+            
+            // Android 환경에서는 Android 인터페이스를 통해 이동
+            if (typeof Android !== 'undefined' && Android.navigateToMainPage) {
+                console.log('Calling Android.navigateToMainPage');
+                Android.navigateToMainPage();
+            } else {
+                // 웹 환경에서는 직접 이동
+                console.log('Navigating to main_page.html');
+                window.location.href = 'main_page.html';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>인증 방식을 선택해 주세요</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      /* 기본 테마 토큰 */
+      :root {
+        --bg: #ffffff;
+        --text: #0f172a;
+        --muted: #596277;
+        --line: #e5e7eb;
+        --brand: #eab308;        /* 노랑 기본 */
+        --brand-dark: #ca8a04;   /* 노랑 진한 */
+        --surface: #fffdf5;      /* 노랑빛 배경 */
+        --card: #ffffff;
+        --accent-soft: #fef9c3;  /* soft yellow */
+        --accent-ring: rgba(234, 179, 8, 0.25);
+      }
+
+      /* 프로토타입 테마 1: Sunrise - 은은한 크림 노랑 + 하늘 포인트 */
+      .theme-sunrise {
+        --bg: #ffffff;
+        --text: #0f172a;
+        --muted: #5b6478;
+        --line: #e9ecf3;
+        --brand: #facc15;        /* yellow-400 */
+        --brand-dark: #eab308;   /* yellow-500 */
+        --surface: #fffbeb;      /* amber-50 */
+        --card: #ffffff;
+        --accent-soft: #fff7c2;
+        --accent-ring: rgba(250, 204, 21, .35);
+      }
+
+      /* 프로토타입 테마 2: Honey - 따뜻한 꿀톤 + 초록 포인트 */
+      .theme-honey {
+        --bg: #fffaf0;           /* ivory */
+        --text: #1f2a37;
+        --muted: #6b7280;
+        --line: #eadbb5;
+        --brand: #f4b400;        /* honey */
+        --brand-dark: #c48800;
+        --surface: #fff6d6;
+        --card: #fffef8;
+        --accent-soft: #fff1b8;
+        --accent-ring: rgba(244, 180, 0, .35);
+      }
+
+      /* 확장 테마: Sunrise Glow - 유리/그라데이션 강조 */
+      .theme-sunrise-glow {
+        --bg: linear-gradient(180deg, #fffce8 0%, #ffffff 70%);
+        --text: #0f172a;
+        --muted: #596277;
+        --line: rgba(0,0,0,.06);
+        --brand: #fde047;        /* yellow-300 */
+        --brand-dark: #eab308;
+        --surface: rgba(255,255,255,.65);
+        --card: rgba(255,255,255,.7);
+        --accent-soft: rgba(253, 224, 71, .35);
+        --accent-ring: rgba(253, 224, 71, .45);
+        backdrop-filter: blur(6px);
+      }
+
+      /* 확장 테마: Sunrise Outline - 미니멀한 라인 + 화이트 공간 */
+      .theme-sunrise-outline {
+        --bg: #ffffff;
+        --text: #0b1220;
+        --muted: #5b6478;
+        --line: #e9e2b5;         /* 연노랑 라인 */
+        --brand: #facc15;
+        --brand-dark: #ca8a04;
+        --surface: #fffef5;
+        --card: #ffffff;
+        --accent-soft: #fffdf0;
+        --accent-ring: rgba(234, 179, 8, .25);
+      }
+
+      /* 확장 테마: Honey Latte - 종이 질감 느낌(미세 노이즈) */
+      .theme-honey-latte {
+        --bg: #fffaf3;
+        --text: #1f2937;
+        --muted: #6b7280;
+        --line: #eadfd1;
+        --brand: #f1b317;
+        --brand-dark: #d09b12;
+        --surface: #fff6e3;
+        --card: #fffdf6;
+        --accent-soft: #fff2cc;
+        --accent-ring: rgba(241, 179, 23, .35);
+      }
+
+      /* 종이 질감 배경 (라떼 전용 옵션) */
+      .theme-honey-latte body, body.theme-honey-latte {
+        background-image: radial-gradient(rgba(0,0,0,.02) 1px, transparent 1px);
+        background-size: 6px 6px;
+      }
+
+      * { 
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box; 
+      }
+      
+      html, body { 
+        height: 100%; 
+      }
+      
+      body {
+        font-family: 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      .page {
+        max-width: 1160px;
+        margin: 40px auto 80px;
+        padding: 0 20px;
+      }
+
+      .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 16px;
+        color: var(--text);
+      }
+
+      .notice {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        gap: 12px;
+        padding: 16px 20px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        box-shadow: 0 2px 0 0 var(--accent-soft) inset;
+        margin-bottom: 18px;
+      }
+      
+      .notice-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--accent-soft);
+        color: var(--brand-dark);
+        font-weight: 700;
+        font-size: 18px;
+      }
+      
+      .notice-body { 
+        font-size: 14px; 
+        color: var(--text);
+      }
+      
+      .notice-body ul { 
+        margin: 0 0 6px 18px; 
+        padding: 0; 
+        list-style: none;
+      }
+      
+      .notice-body li {
+        padding: 4px 0;
+        position: relative;
+      }
+      
+      .notice-body li:before {
+        content: "•";
+        color: var(--brand);
+        font-weight: bold;
+        position: absolute;
+        left: -18px;
+      }
+      
+      .notice-link { 
+        color: var(--brand-dark); 
+        text-decoration: underline; 
+        font-weight: 500; 
+      }
+
+      .tabs {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .tab {
+        padding: 12px 10px;
+        background: linear-gradient(180deg, #f9fafb, #f3f4f6);
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--muted);
+        transition: all 0.2s ease;
+      }
+      
+      .tab:hover {
+        background: #f9fafb;
+      }
+      
+      .tab.is-active { 
+        background: var(--card); 
+        color: var(--brand-dark); 
+        box-shadow: inset 0 -3px 0 0 var(--brand); 
+      }
+
+      .panel { 
+        margin-top: 18px; 
+      }
+      
+      .panel[hidden] { 
+        display: none !important; 
+      }
+
+      .auth-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 16px;
+      }
+
+      .card {
+        display: grid;
+        grid-template-columns: 64px 1fr 20px;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 18px;
+        background: var(--card);
+        transition: box-shadow .2s ease, transform .15s ease;
+        cursor: pointer;
+      }
+      
+      .card:hover { 
+        box-shadow: 0 10px 24px rgba(0,0,0,0.08), 0 0 0 3px var(--accent-ring); 
+        transform: translateY(-2px); 
+      }
+      
+      .card-icon { 
+        font-size: 30px; 
+      }
+      
+      .card-title { 
+        margin: 0 0 6px; 
+        font-size: 18px; 
+        color: var(--text);
+        font-weight: 600;
+      }
+      
+      .card-desc { 
+        margin: 0; 
+        color: var(--muted); 
+        font-size: 14px; 
+        line-height: 1.45; 
+      }
+      
+      .card-arrow { 
+        color: #9ca3af; 
+        font-size: 24px; 
+        justify-self: end; 
+      }
+
+      .signup-cta {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        align-items: center;
+        gap: 14px;
+        margin-top: 20px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--accent-soft);
+        padding: 18px;
+      }
+      
+      .cta-illust { 
+        font-size: 60px; 
+        text-align: center; 
+        filter: drop-shadow(0 4px 0 rgba(0,0,0,.05)); 
+      }
+      
+      .cta-title { 
+        margin: 0 0 6px; 
+        font-size: 22px; 
+        font-weight: 800; 
+        color: var(--brand-dark); 
+      }
+      
+      .cta-desc { 
+        margin: 0 0 10px; 
+        color: var(--text); 
+        opacity: .85; 
+      }
+      
+      .cta-list { 
+        margin: 0 0 12px 18px; 
+        color: var(--text); 
+        opacity: .75; 
+      }
+
+      .btn {
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center;
+        height: 40px; 
+        padding: 0 16px; 
+        border-radius: 8px;
+        border: 1px solid transparent;
+        font-weight: 700; 
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      
+      .btn.primary { 
+        background: var(--brand); 
+        color: #1f2937; 
+      }
+      
+      .btn.primary:hover { 
+        background: var(--brand-dark); 
+        transform: translateY(-1px);
+      }
+
+      .corp-placeholder {
+        border: 1px dashed var(--line);
+        border-radius: 12px;
+        padding: 28px; 
+        color: var(--muted);
+        text-align: center;
+      }
+
+      /* desktop only base width lock to mimic original page */
+      @media (min-width: 1280px) {
+        body { 
+          background: linear-gradient(#fff, #fff) no-repeat; 
+        }
+      }
+
+      /* 모바일 반응형 */
+      @media (max-width: 768px) {
+        .page {
+          padding: 0 16px;
+        }
+        
+        .page-title {
+          font-size: 24px;
+        }
+        
+        .auth-grid {
+          grid-template-columns: 1fr;
+        }
+        
+        .card {
+          grid-template-columns: 50px 1fr 16px;
+          padding: 16px;
+        }
+        
+        .card-icon {
+          font-size: 24px;
+        }
+        
+        .card-title {
+          font-size: 16px;
+        }
+        
+        .card-desc {
+          font-size: 13px;
+        }
+        
+        .signup-cta {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        
+        .cta-illust {
+          font-size: 48px;
+        }
+      }
+    </style>
+  </head>
+  <body class="theme-sunrise">
+    <main class="page" aria-label="로그인 선택 페이지">
+      <h1 class="page-title">인증 방식을 선택해 주세요</h1>
+
+      <section class="notice" aria-label="안내">
+        <div class="notice-icon" aria-hidden="true">i</div>
+        <div class="notice-body">
+          <ul>
+            <li>각 인증 방식은 보안 수준과 사용 편의성에 따라 선택하실 수 있습니다.</li>
+                            <li>타이핑 서명 인증은 별도의 하드웨어나 인증서 없이 키보드만으로 안전한 인증이 가능합니다.</li>
+          </ul>
+                      <a class="notice-link" href="#" role="link">타이핑 서명 인증 기술 상세 안내</a>
+        </div>
+      </section>
+
+      <div class="tabs" role="tablist" aria-label="사용자 유형">
+        <button id="tab-personal" class="tab is-active" role="tab" aria-selected="true" aria-controls="panel-personal">개인사용자</button>
+        <button id="tab-corporate" class="tab" role="tab" aria-selected="false" aria-controls="panel-corporate">기업사용자</button>
+      </div>
+
+      <section id="panel-personal" class="panel is-active" role="tabpanel" aria-labelledby="tab-personal">
+        <div class="auth-grid">
+          <article class="card" onclick="goToKeystrokeAuth()">
+            <div class="card-icon" aria-hidden="true">⌨️</div>
+            <div class="card-content">
+              <h3 class="card-title">타이핑 서명 인증</h3>
+              <p class="card-desc">타이핑 패턴과 속도를 분석하여 본인을 인증하는 방식입니다. 별도의 인증서나 앱 없이 키보드 입력만으로 안전하게 로그인할 수 있어요.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">📱</div>
+            <div class="card-content">
+              <h3 class="card-title">모바일신분증</h3>
+              <p class="card-desc">모바일 신분증을 이용하여 로그인 해 보세요.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🏛️</div>
+            <div class="card-content">
+              <h3 class="card-title">공동인증서</h3>
+              <p class="card-desc">회원인증서 관리 메뉴에서 공동인증서를 등록해주셔야 이용이 가능해요. 처음 로그인 하는 경우, 다른 인증 수단을 선택해 주세요.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">🆔</div>
+            <div class="card-content">
+              <h3 class="card-title">아이핀인증</h3>
+              <p class="card-desc">본인 아이핀정보로 인증 후 로그인 할 수 있습니다.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">✅</div>
+            <div class="card-content">
+              <h3 class="card-title">간편인증</h3>
+              <p class="card-desc">카카오, KB국민은행, 통신사PASS, 삼성패스, 네이버, 신한은행, 토스, 뱅크샐러드, 하나은행, NH, 카카오뱅크, 우리 인증서를 이용하여 로그인 할 수 있습니다.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon" aria-hidden="true">💳</div>
+            <div class="card-content">
+              <h3 class="card-title">금융인증서</h3>
+              <p class="card-desc">간편비밀번호(PIN)·패턴·지문 등을 이용하여 로그인 해 보세요.</p>
+            </div>
+            <div class="card-arrow" aria-hidden="true">›</div>
+          </article>
+        </div>
+
+        <aside class="signup-cta">
+          <div class="cta-illust" aria-hidden="true">🏦</div>
+          <div class="cta-body">
+            <h3 class="cta-title">안전한 인증 서비스</h3>
+            <p class="cta-desc">고객님의 안전한 금융 거래를 위해 다양한 인증 방식을 제공합니다. 본인 확인 후 서비스를 이용하실 수 있습니다.</p>
+            <ul class="cta-list">
+              <li>24시간 안전한 인증 서비스</li>
+              <li>다양한 인증 방식 지원</li>
+              <li>빠르고 편리한 본인 확인</li>
+            </ul>
+            <button class="btn primary" id="btn-join">인증 서비스 이용하기</button>
+          </div>
+        </aside>
+      </section>
+
+      <section id="panel-corporate" class="panel" role="tabpanel" aria-labelledby="tab-corporate" hidden>
+        <div class="corp-placeholder">
+          <p>기업사용자 인증 UI는 현재 더미입니다. 상단 탭으로 개인사용자/기업사용자 전환만 가능합니다.</p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+              // 타이핑 서명 인증 페이지로 이동
+      function goToKeystrokeAuth() {
+        // Android 앱 내에서 실행 중인 경우
+        if (window.Android) {
+          // Android 네이티브 함수 호출
+          window.Android.startKeystrokeAuth();
+        } else {
+          // 웹 브라우저에서 테스트할 때
+          console.log('타이핑 서명 인증으로 이동');
+          window.location.href = './keystroke_auth.html';
+        }
+      }
+      
+      // 탭 전환
+      document.addEventListener('DOMContentLoaded', function() {
+        const tabs = document.querySelectorAll('.tab');
+        const panels = document.querySelectorAll('.panel');
+        
+        // 탭 전환
+        tabs.forEach(tab => {
+          tab.addEventListener('click', function() {
+            const targetPanel = this.id === 'tab-personal' ? 'panel-personal' : 'panel-corporate';
+            
+            // 탭 활성화
+            tabs.forEach(t => {
+              t.classList.remove('is-active');
+              t.setAttribute('aria-selected', 'false');
+            });
+            this.classList.add('is-active');
+            this.setAttribute('aria-selected', 'true');
+            
+            // 패널 표시/숨김
+            panels.forEach(panel => {
+              panel.classList.remove('is-active');
+              panel.hidden = true;
+            });
+            document.getElementById(targetPanel).classList.add('is-active');
+            document.getElementById(targetPanel).hidden = false;
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

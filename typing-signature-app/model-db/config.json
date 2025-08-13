@@ -1,0 +1,37 @@
+{
+    "GPU": "True",
+    "data": {
+        "keystroke_sequence_len": 50,
+        "aalto": {
+            "dataset_url": "https://userinterfaces.aalto.fi/typing37k/data/csv_raw_and_processed.zip"
+        }
+    },
+    "preprocessed_data": {
+        "aalto": {
+            "keystroke": ""
+        }
+    },
+    "hyperparams": {
+        "batch_size": {
+            "aalto": 512
+        },
+        "epoch_batch_count": {
+            "aalto": 20
+        },
+        "keystroke_feature_count": 3,
+        "target_len": 128,
+        "number_of_enrollment_sessions": {
+            "aalto": 10
+        },
+        "number_of_verify_sessions": {
+            "aalto": 5
+        },
+        "learning_rate": 0.001,
+        "margin": 1.0,
+        "dropout": 0.1,
+        "num_layers": 4,
+        "d_model": 192,
+        "num_heads": 8,
+        "hidden_size": 192
+    }
+} 

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>키 스트로크 인증 · Local</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root{--y:#fbbf24;--yd:#f59e0b;--text:#1f2937;--line:#ece7c8;--glass-bg:rgba(255,255,255,0.65);--glass-blur:18px;--success:#34d399;--error:#f87171;--info:#60a5fa;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;background:linear-gradient(135deg,#fffce8,#fff)}
+    .wrap{max-width:1100px;margin:40px auto 80px;padding:0 20px}
+    .grid{display:grid;grid-template-columns: 1fr 480px;gap:18px;align-items:start;}
+    .panel{border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 20px 40px rgba(0,0,0,.06);padding:18px}
+    .panel.log-panel{height:600px;overflow:auto;min-height:300px;max-height:80vh;}
+    .panel.auth-panel{min-height:300px;overflow-y:auto;}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;font-size:12px}
+    th{color:#6b7280}
+    .display{border:1px solid var(--line);border-radius:12px;background:#fffef8;padding:12px}
+    .input{width:100%;height:48px;border:1px solid var(--line);border-radius:12px;padding:0 14px;font:inherit;margin-top:10px}
+    .input:focus{outline:none;box-shadow:0 0 0 4px rgba(251,191,36,.25);border-color:var(--y)}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .btn{height:42px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600}
+    .btn.primary{background:linear-gradient(135deg,var(--y),var(--yd));color:#1f2937;border-color:transparent}
+    .btn:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 4px 16px rgba(251,191,36,0.10)}
+    .status-ani{animation:fadeInUp .7s cubic-bezier(.23,1.01,.32,1) both}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+    .glass-card{background:var(--glass-bg);backdrop-filter:blur(var(--glass-blur));border-radius:18px;box-shadow:0 8px 32px rgba(0,0,0,0.10);border:1.5px solid rgba(255,255,255,0.25);padding:28px 24px;margin-top:18px;position:relative;overflow:hidden;transition:.3s box-shadow;}
+    .glass-card.success{border-color:var(--success);box-shadow:0 8px 32px rgba(52,211,153,0.10)}
+    .glass-card.error{border-color:var(--error);box-shadow:0 8px 32px rgba(248,113,113,0.10)}
+    .glass-card .icon{font-size:38px;position:absolute;top:-22px;right:18px;opacity:0.18;pointer-events:none;}
+    .glass-card .title{font-size:20px;font-weight:800;margin-bottom:10px;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;}
+    .glass-card .desc{font-size:14px;color:#64748b;margin-bottom:10px;}
+    .glass-card .json-view{font-family:ui-monospace, Menlo, Consolas, monospace;font-size:13px;line-height:1.7;background:rgba(255,255,255,0.7);border-radius:10px;padding:14px 16px;margin:10px 0 0 0;overflow-x:auto;box-shadow:0 1px 4px rgba(0,0,0,0.04);border:1px solid #f3f4f6;white-space:pre-wrap;}
+    .glass-card .pattern{font-size:12px;color:#a3a3a3;margin-top:10px;word-break:break-all;}
+    .glass-card .fade-in{animation:fadeInUp .7s cubic-bezier(.23,1.01,.32,1) both}
+    .glass-card .icon-success{color:var(--success)}
+    .glass-card .icon-error{color:var(--error)}
+    .glass-card .icon-info{color:var(--info)}
+    .tip{font-size:12px;color:#6b7280;margin-top:6px}
+    .progress{height:8px;background:#f3f4f6;border-radius:999px;overflow:hidden;margin-top:8px}
+    .progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--y),var(--yd));transition:width .25s}
+    .mode{display:flex;gap:10px;align-items:center;margin-top:10px}
+    .select{height:36px;border:1px solid var(--line);border-radius:8px;padding:0 10px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="grid">
+      <section class="panel log-panel">
+        <div style="font-weight:800">입력 로그</div>
+        <table>
+          <thead><tr><th>시간(ms)</th><th>키</th><th>타입</th></tr></thead>
+          <tbody id="log"></tbody>
+        </table>
+      </section>
+      <section class="panel auth-panel">
+        <div style="font-weight:800">키 스트로크 인증</div>
+        <div id="text" class="display">좋은 하루 보내세요.</div>
+        <div class="mode">
+          <label><input type="radio" name="mode" value="verify" checked /> 검증</label>
+          <label><input type="radio" name="mode" value="enroll" /> 등록</label>
+          <select id="userSelect" class="select"></select>
+        </div>
+        <div id="root"></div>
+      </section>
+    </div>
+  </div>
+
+  <script type="text/babel">
+    const {useState,useEffect,useRef}=React;
+    function App(){
+      const [state,setState]=useState('idle');
+      const [v,setV]=useState('');
+      const [p,setP]=useState(0);
+      const [result,setResult]=useState(null);
+      const inputRef=useRef(null);
+      const expected=document.getElementById('text').textContent;
+      const modeRef = useRef('verify');
+      const userSelect = document.getElementById('userSelect');
+
+      // capture state
+      const pressMapRef = useRef(new Map());
+      const startTimeRef = useRef(performance.now());
+      const eventsRef = useRef([]);
+      const capturingRef = useRef(false);
+
+      useEffect(()=>{ inputRef.current?.focus(); },[]);
+      useEffect(()=>{
+        function onKey(e){ const tr=document.createElement('tr'); tr.innerHTML=`<td>${e.timeStamp.toFixed(0)}</td><td>${e.key}</td><td>${e.type}</td>`; document.getElementById('log').prepend(tr); }
+        const el=inputRef.current; el.addEventListener('keydown',onKey); el.addEventListener('keyup',onKey); return ()=>{ el.removeEventListener('keydown',onKey); el.removeEventListener('keyup',onKey); };
+      },[]);
+
+      useEffect(()=>{
+        // bind capture
+        const el = inputRef.current;
+        function reset(){ eventsRef.current=[]; pressMapRef.current.clear(); startTimeRef.current=performance.now(); }
+        function keyId(e){ return e.code || e.key || null; }
+        function onDown(e){ if(!capturingRef.current || e.repeat) return; const c=keyId(e); if(!c) return; const t=(performance.now()-startTimeRef.current)/1000; const m=pressMapRef.current; if(!m.has(c)) m.set(c,[]); m.get(c).push(t); }
+        function onUp(e){ if(!capturingRef.current) return; const c=(e.code||e.key||null); if(!c) return; const t=(performance.now()-startTimeRef.current)/1000; const m=pressMapRef.current; const arr=m.get(c)||[]; if(arr.length>0){ const press=arr.shift(); if(t>=press){ eventsRef.current.push({press, release:t, key:c}); } } }
+        el.addEventListener('focus', () => { reset(); capturingRef.current = true; });
+        el.addEventListener('keydown', onDown);
+        el.addEventListener('keyup', onUp);
+        return ()=>{ el.removeEventListener('focus', reset); el.removeEventListener('keydown', onDown); el.removeEventListener('keyup', onUp); };
+      },[]);
+
+      useEffect(()=>{
+        // load users
+        fetch('/api/users').then(r=>r.json()).then(d=>{
+          const users = d.users||[]; userSelect.innerHTML='';
+          for(const u of users){ const opt=document.createElement('option'); opt.value=u; opt.textContent=u; userSelect.appendChild(opt); }
+        }).catch(()=>{});
+        // bind mode
+        const radios = Array.from(document.querySelectorAll('input[name="mode"]'));
+        const onchg = ()=>{ modeRef.current = radios.find(r=>r.checked)?.value || 'verify'; };
+        radios.forEach(r=> r.addEventListener('change', onchg));
+        return ()=> radios.forEach(r=> r.removeEventListener('change', onchg));
+      },[]);
+
+      async function start(){
+        if(state==='processing') return;
+        if(v.trim()!==expected){ alert('문장을 정확히 입력해주세요.'); inputRef.current?.focus(); return; }
+        setState('processing'); setP(0); setResult(null);
+        // 입력창 포커스 상태에서 이미 캡처된 이벤트를 사용하고, 이제 캡처를 종료합니다.
+        capturingRef.current=false;
+        const timer=setInterval(()=> setP(x=> Math.min(100,x+8)), 160);
+        try{
+          const events = [...eventsRef.current];
+          const user = userSelect.value || 'USER1';
+          const m = modeRef.current;
+          let res;
+          if(m==='enroll'){
+            res = await fetch('/api/enroll', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ user, sessions:[events] }) });
+          }else{
+            res = await fetch('/api/verify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ user, events }) });
+          }
+          const data = await res.json();
+          clearInterval(timer); setP(100); setResult({raw: data}); setState(res.ok? 'success':'error');
+        }catch(err){
+          clearInterval(timer); setP(100); setResult({ error: err?.message || '네트워크 오류' }); setState('error');
+        }
+      }
+      function reset(){ setState('idle'); setV(''); setP(0); setResult(null); inputRef.current?.focus(); eventsRef.current=[]; pressMapRef.current.clear(); }
+
+      function syntaxHighlight(json) {
+        if (!json) return '';
+        json = typeof json === 'string' ? json : JSON.stringify(json, undefined, 2);
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|\b[\d.eE+-]+\b)/g, function (match) {
+          let cls = 'number';
+          if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+              cls = 'key';
+            } else {
+              cls = 'string';
+            }
+          } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+          } else if (/null/.test(match)) {
+            cls = 'null';
+          }
+          return `<span class="json-${cls}">${match}</span>`;
+        });
+      }
+
+      return (
+        <div>
+          <div className="tip" style={{marginBottom:'16px',padding:'10px 18px',background:'#fef9c3',borderRadius:'10px',fontWeight:600,fontSize:'15px',color:'#b45309',display:'inline-block',boxShadow:'0 2px 8px rgba(251,191,36,0.08)'}}>
+            <span style={{fontWeight:800,letterSpacing:'0.5px'}}>모드: {modeRef.current==='enroll'?'등록 (Enroll)':'검증 (Verify)'}</span>
+          </div>
+          <input ref={inputRef} className="input" placeholder="여기에 입력하세요" value={v} onChange={e=>setV(e.target.value)} onKeyDown={e=>{if(e.key==='Enter') start();}} />
+          <div className="row">
+            <button className="btn primary" onClick={start}>{modeRef.current==='enroll'? '등록 시작':'인증 시작'}</button>
+            <button className="btn" onClick={reset}>다시 시작</button>
+          </div>
+          {state==='processing' && <div className="status">분석 중...<div className="progress"><i style={{width:p+'%'}}></i></div></div>}
+          {state==='success' && (
+            <div className="glass-card success status-ani fade-in">
+              <div className="icon icon-success"><i className="fa-solid fa-circle-check"></i></div>
+              <div className="title"><i className="fa-solid fa-bolt"></i> {modeRef.current==='enroll'? '등록 완료':'인증 성공!'}</div>
+              <div className="desc">{modeRef.current==='enroll'? '타이핑 템플릿이 저장되었습니다.':'타이핑 패턴이 성공적으로 인증되었습니다.'}</div>
+              <div className="json-view" style={{marginTop:'22px'}} dangerouslySetInnerHTML={{__html: syntaxHighlight(result?.raw)}}></div>
+            </div>
+          )}
+          {state==='error' && (
+            <div className="glass-card error status-ani fade-in">
+              <div className="icon icon-error"><i className="fa-solid fa-circle-xmark"></i></div>
+              <div className="title"><i className="fa-solid fa-triangle-exclamation"></i> 처리 실패</div>
+              <div className="desc">{(result?.error)||'다시 시도해 주세요.'}</div>
+            </div>
+          )}
+        </div>
+      )
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+  </script>
+</body>
+</html>
+
+

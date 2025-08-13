@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify - Keystroke</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    input, button, select, textarea { padding: 8px; margin: 4px 0; }
+    .box { width: 100%; height: 120px; border: 1px dashed #aaa; border-radius: 6px; padding: 8px; }
+    a { color: #0a58ca; text-decoration: none; margin-right: 8px; }
+    .muted { color: #666; font-size: 12px; }
+    .log { white-space: pre-wrap; font-family: ui-monospace, monospace; font-size: 12px; }
+  </style>
+  <script>
+    const FIXED_PHRASE = '안녕하세요 국민은행';
+    let currentEvents = [];
+    let pressMap = new Map();
+    let startTime = performance.now();
+    let isCapturing = false;
+
+    function resetCapture() {
+      currentEvents = [];
+      pressMap.clear();
+      startTime = performance.now();
+      document.getElementById('events').textContent = '';
+    }
+
+    function keyToId(e) {
+      if (e && typeof e.code === 'string' && e.code.length > 0) return e.code;
+      if (e && typeof e.key === 'string' && e.key.length > 0) return e.key;
+      return null;
+    }
+    function onKeyDown(e) {
+      if (!isCapturing) return;
+      if (e.repeat) return;
+      const c = keyToId(e); if (c===null) return;
+      const t = (performance.now() - startTime)/1000.0;
+      if (!pressMap.has(c)) pressMap.set(c, []);
+      pressMap.get(c).push(t);
+    }
+    function onKeyUp(e) {
+      if (!isCapturing) return;
+      const c = keyToId(e); if (c===null) return;
+      const t = (performance.now() - startTime)/1000.0;
+      const arr = pressMap.get(c) || [];
+      if (arr.length>0) {
+        const press = arr.shift();
+        if (t>=press) {
+          currentEvents.push({ press, release: t, key: c });
+          document.getElementById('events').textContent = `count=${currentEvents.length}`;
+        }
+      }
+    }
+    function bindCapture(el) {
+      el.addEventListener('focus', () => resetCapture());
+      el.addEventListener('keydown', onKeyDown);
+      el.addEventListener('keyup', onKeyUp);
+    }
+
+    async function api(path, method, body) {
+      const res = await fetch(path, { method, headers: {'Content-Type': 'application/json'}, body: body? JSON.stringify(body): undefined });
+      if (!res.ok) throw new Error(await res.text());
+      return await res.json();
+    }
+
+    async function refreshUsers() {
+      const out = await api('/api/users','GET');
+      const sel = document.getElementById('user');
+      sel.innerHTML = '';
+      for (const u of out.users || []) {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = u;
+        sel.appendChild(opt);
+      }
+      document.getElementById('user_count').textContent = (out.users||[]).length;
+    }
+
+    async function deleteAll() {
+      if (!confirm('모든 등록 사용자를 삭제할까요?')) return;
+      const out = await api('/api/users','DELETE');
+      document.getElementById('log').textContent = JSON.stringify(out, null, 2);
+      await refreshUsers();
+    }
+
+    async function deleteOne() {
+      const user = document.getElementById('user').value;
+      if (!user) { alert('삭제할 사용자를 선택하세요'); return; }
+      if (!confirm(`${user} 사용자를 삭제할까요?`)) return;
+      const out = await api(`/api/users/${encodeURIComponent(user)}`,'DELETE');
+      document.getElementById('log').textContent = JSON.stringify(out, null, 2);
+      await refreshUsers();
+    }
+
+    function startCapture() {
+      resetCapture();
+      isCapturing = true;
+      document.getElementById('status').textContent = 'Recording...';
+      document.getElementById('verify_phrase').focus();
+    }
+
+    async function stopAndVerify() {
+      if (!isCapturing) { alert('먼저 Start를 누르세요.'); return; }
+      isCapturing = false;
+      document.getElementById('status').textContent = `Captured ${currentEvents.length} events`;
+      const user = document.getElementById('user').value;
+      if (!user) { alert('등록된 사용자가 없습니다. 먼저 등록하세요.'); return; }
+      const area = document.getElementById('verify_phrase');
+      const text = area.value.trim();
+      if (text !== FIXED_PHRASE) { alert('고정 문구와 일치해야 합니다: ' + FIXED_PHRASE); return; }
+      const eventsCopy = [...currentEvents];
+      if (eventsCopy.length < 5) { alert('타이핑 이벤트가 너무 적습니다. 다시 시도하세요.'); return; }
+      const out = await api('/api/verify','POST', { user, events: eventsCopy });
+      document.getElementById('log').textContent = JSON.stringify(out, null, 2);
+      area.value = '';
+    }
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      bindCapture(document.getElementById('verify_phrase'));
+      await refreshUsers();
+    });
+  </script>
+</head>
+<body>
+  <h2>Verify</h2>
+  <div><a href="/enroll">Go to Enroll</a></div>
+  <div class="muted">등록된 사용자 수: <span id="user_count">0</span>명 (최대 2명)
+  </div>
+  <div style="margin:8px 0">
+    <button onclick="deleteAll()">모든 사용자 삭제</button>
+    <button onclick="deleteOne()">선택 사용자 삭제</button>
+  </div>
+
+  <div class="card">
+    <label>user</label>
+    <select id="user"></select>
+    <div class="muted">고정 문구: <b>안녕하세요 국민은행</b></div>
+    <div class="muted">아래 입력창에 포커스 후 위 문구를 그대로 타이핑하면 기록됩니다.</div>
+    <textarea id="verify_phrase" class="box" placeholder="안녕하세요 국민은행"></textarea>
+    <div>
+      <button onclick="startCapture()">Start</button>
+      <button onclick="stopAndVerify()">Stop & Verify</button>
+    </div>
+    <div class="muted" id="status"></div>
+  </div>
+
+  <div class="card">
+    <h3>Events snapshot (마지막)</h3>
+    <div id="events" class="log"></div>
+  </div>
+  <div class="card">
+    <h3>Response</h3>
+    <div id="log" class="log"></div>
+  </div>
+</body>
+</html>
+
+
