@@ -1,4 +1,6 @@
-## KB AI Challenge — Typing Signature Authentication
+<img width="2100" height="1181" alt="image" src="https://github.com/user-attachments/assets/200a43e6-6d64-4e29-994e-0bc0b1328fc4" />
+
+## KB AI Challenge — 타이핑 서명 본인 인증 솔루션
 
 ### 개요
 - **목표**: 타이핑 서명을 이용해 사용자를 등록/인증하는 시스템
@@ -8,9 +10,15 @@
   - 사용자 인증/식별(L2 또는 코사인 거리, 임계값 자동 로드)
   - 임베딩 AES-GCM 암호화 저장(MySQL)
 
+```
+  [Client: Web/App] <-- JSON/API --> [Backend: FastAPI Server] <-- SQLAlchemy --> [Database: MySQL]
+      |                                      |                                      ^
+      |                                      v                                      |
+      +----------------------------> [AI Model: PyTorch] ---------------------------+
+```
 ---
 
-### 저장소 구조
+### 레포지토리 구조
 - `typing-signature-app/`: 안드로이드 앱(Compose UI, WebView 기반 타이핑 수집)
   - `app/src/main/java/com/hyunsung/key_stroke/data/Constants.kt`: 서버 URL 설정
   - `app/src/main/assets/`: HTML/JS 자산
@@ -20,11 +28,11 @@
   - `utils/db.py`: MySQL 접속/스키마
   - `utils/crypto.py`: 임베딩 암복호화(AES-GCM)
   - `docker-compose.yml`: MySQL + FastAPI 구동
-- `typing-signature-model/`: 간단한 모델/평가 스켈레톤
+- `typing-signature-model/`: 모델/평가 스켈레톤
 
 ---
 
-## API 요약
+## API 명세
 - `GET /api/config`: `{ seq_len, threshold, users }`
 - `GET /api/users`: `{ users: string[] }`
 - `DELETE /api/users`: `{ deleted, users }` (모두 삭제)
